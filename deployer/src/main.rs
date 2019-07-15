@@ -1,10 +1,12 @@
 #![allow(non_snake_case)]
 #![deny(warnings)]
 
-use std::{fs, str};
+use std::{fs};
 // use std::env;
 use std::path::{Path};
 // use clap::{Arg, App}; // value_t
+use std::time::SystemTime;
+use chrono::{DateTime, offset::Local as LocalTz}; //SubsecRound,
 
 mod config;
 
@@ -55,6 +57,15 @@ fn main() {
     //     println!("{} {}", if f.is_file() { "f" } else { "d" }, f.display());
     // }
     // let ss = str::
+
+    let x = String::from("s: &String");
+    let x = x.replace("s", "tos");
+    let start = SystemTime::now();
+
+  
+
+    println!("x:: {} , {:?}", x, start);
+
     let p = Path::new("/users/shaipe/dist/");
     walk_dir(&p);
 
@@ -64,12 +75,29 @@ fn main() {
 
 fn walk_dir(dir: &Path) {
     for entry in fs::read_dir(dir).unwrap() {
-        let path = entry.unwrap().path();
+        let ent = entry.unwrap();
+        let path = ent.path();
+        let data = ent.metadata().unwrap();
         if path.is_dir(){
             walk_dir(&path);
         }
         else{
-            println!("{:?}", path);
+
+            if let Ok(modified) = data.modified() {
+                let modified: DateTime<LocalTz> = modified.into();
+                println!("{:?}", modified);
+            }
+            if let Ok(time) = data.modified() {
+                println!("{:?}", time);
+            }
+            // if data.is_file() {
+            //     if let Some(ex) = path.extension() {
+            //         if ex == "js" && data.len() > 1024 {
+            //             println!("{} length {}", path.display(),data.len());
+            //         }
+            //     }
+            // }
+            // println!("{:?}", data);
         }
     }
 }
