@@ -83,9 +83,35 @@ fn walk_dir(dir: &Path) {
         }
         else{
 
+
+            // // Set `Last-Modified` and check `If-Modified-Since`.
+            // if let Ok(modified) = metadata.modified() {
+            //     let modified: DateTime<LocalTz> = modified.into();
+
+            //     match self.if_modified_since {
+            //         // Truncate before comparison, because the `Last-Modified` we serve
+            //         // is also truncated through `DateTime::to_rfc2822`.
+            //         Some(v) if modified.trunc_subsecs(0) <= v.trunc_subsecs(0) => {
+            //             return ResponseBuilder::new()
+            //                 .status(StatusCode::NOT_MODIFIED)
+            //                 .body(Body::empty())
+            //         },
+            //         _ => {},
+            //     }
+
+            //     res.header(header::LAST_MODIFIED, modified.to_rfc2822().as_str());
+            //     res.header(header::ETAG, format!("W/\"{0:x}-{1:x}.{2:x}\"",
+            //         metadata.len(), modified.timestamp(), modified.timestamp_subsec_nanos()).as_str());
+            // }
+            let dt = DateTime::parse_from_str("2019-07-01 10:31:19 +08:00", "%Y-%m-%d %H:%M:%S %z");
+
             if let Ok(modified) = data.modified() {
                 let modified: DateTime<LocalTz> = modified.into();
-                println!("{:?}", modified);
+                // Some(dt) if modified.trunc_subsecs(0) >= dt.trunc_subsecs(0) => {
+                //     return "x"
+                // }
+
+                println!("{:?}, dt : {:?}", modified, dt);
             }
             if let Ok(time) = data.modified() {
                 println!("{:?}", time);
