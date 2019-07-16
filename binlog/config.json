@@ -1,0 +1,8 @@
+{
+    "database":{
+        "server": "localhost",
+        "port": 27017,
+        "database": "binlog",
+        "db_type": "Mongo"
+    }
+}
