@@ -225,6 +225,8 @@ fn write_to_mongo(db_conf: &DBConfig, data: Vec<AnalyzeResult>){
     // Insert document into 'test.movies' collection
     coll.insert_many(docs.clone(), None)
             .ok(); //.expect("Failed to insert document.");
+
+    // client
     // std::panic::catch_unwind(|| {
     //         println!("{}", "Failed to insert document.");
     //     }
@@ -299,9 +301,9 @@ fn main() {
     let start = time::now(); //获取开始时间
     
     // write_to_mongo(c.database);
-    let f_path = "/users/shaipe/binlog";
+    let f_path = c.root_dir; // "/users/shaipe/binlog";
     // let f_path = "/users/shaipe/react.sh";
-    read_analyze_dir(&f_path, c.database, false);
+    read_analyze_dir(&f_path, c.database, c.multi_thread);
     let end = time::now(); //获取结束时间
     println!(
         "done!start : {:?},end :{:?},duration:{:?}",

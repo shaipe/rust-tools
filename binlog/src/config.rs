@@ -5,7 +5,14 @@ use serde_derive::Deserialize;
 /// binlog 日志分析工具配置信息
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
+    // 数据库配置
     pub database: DBConfig,
+    
+    // 分析日志的根目录
+    pub root_dir: String,
+
+    // 是否启用多线程
+    pub multi_thread: bool
 }
 
 #[derive(Debug, Deserialize, Clone)]

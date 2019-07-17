@@ -1,4 +1,7 @@
 {
+    "root_dir": "/users/shaipe/binlog",
+    "multi_thread": false,
+    
     "database":{
         "server": "localhost",
         "port": 27017,
