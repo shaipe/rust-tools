@@ -10,6 +10,14 @@ use chrono::{DateTime, FixedOffset};
 use regex::Regex;
 use std::path::{Path, PathBuf};
 use std::thread;
+// use std::io::prelude::*;
+
+// macro_rules! try {
+//     ($e:expr) => (match $e {
+//         Ok(val) => val,
+//         Err(err) => return Err(err),
+//     });
+// }
 
 
 mod config;
@@ -78,6 +86,7 @@ fn get_timestamp(d: &str, t: &str) -> i64 {
     let dt = DateTime::parse_from_str(&ex_t, "%Y-%m-%d %H:%M:%S %z");
     let china_timezone = FixedOffset::east(8 * 3600);
     // dt.unwrap().add(Duration::hours(8));
+    // println!("{:?}, -===={:?}", dt, ex_t);
     let dt = dt.unwrap().with_timezone(&china_timezone);
     dt.timestamp_millis()
 }
@@ -85,6 +94,7 @@ fn get_timestamp(d: &str, t: &str) -> i64 {
 /// 读文件,按行读取
 fn read_analyze_file(file_path: &str, db_conf: &DBConfig) {
 
+    println!("开始对文件{:?}进行分析", file_path);
     let file = File::open(&file_path).expect("cannot open file");
     let reader = BufReader::new(file);
     let mut is_record = false;
@@ -99,6 +109,7 @@ fn read_analyze_file(file_path: &str, db_conf: &DBConfig) {
 
     // reader.lines() 需要引用io::BufRead
     for line in reader.lines() {
+        
         let line: String = line.unwrap();
 
         // 判断是否开始记录执行的Sql
@@ -129,11 +140,12 @@ fn read_analyze_file(file_path: &str, db_conf: &DBConfig) {
                 if count % 500 == 0 {
                     println!("已分析{:?}条数据,即将进行入库.", count);
                     let x = sqls.clone();
+
                     write_to_mongo(&db_conf.clone(), x);
                     // 对象重新赋值
                     sqls = vec![];
                 }
-                // println!("{:?}", count % 500);
+                println!("已处理行数:: {:?}", count);
                 
             }
             // 判断表名类型
@@ -144,10 +156,19 @@ fn read_analyze_file(file_path: &str, db_conf: &DBConfig) {
                 // 日期部分
                 let d_str = xx[0].replace("#", "");
                 // 时间部分
-                let t_str = xx[2];
+                let t_str = if xx[1].len() == 0 {
+                    xx[2]
+                }
+                else{
+                    xx[1]
+                };
+                                
+                // println!("line ::: {:?}", line);
                 execute_time = get_timestamp(&d_str, &t_str);
+
                 let re = Regex::new("[`].*[`]").unwrap();
                 if re.is_match(&line) {
+                    // println!("reg_map{:?}", re.captures(&line));
                     let caps = re.captures(&line).unwrap();
                     // println!("{}", caps.get(0).unwrap().as_str());
                     table_name = caps.get(0).unwrap().as_str().replace("`", "");
@@ -179,7 +200,7 @@ fn read_analyze_file(file_path: &str, db_conf: &DBConfig) {
     }
     // 将最后的结果写入数据库中
     write_to_mongo(&db_conf.clone(), sqls);
-    // println!("总行数, {:?}", sqls.len());
+    println!("文件 {:?} 分析结束, 总行数, {:?}", file_path, count);
 }
 
 /// 写入mongodb
@@ -203,8 +224,11 @@ fn write_to_mongo(db_conf: &DBConfig, data: Vec<AnalyzeResult>){
 
     // Insert document into 'test.movies' collection
     coll.insert_many(docs.clone(), None)
-        .ok().expect("Failed to insert document.");
-
+            .ok(); //.expect("Failed to insert document.");
+    // std::panic::catch_unwind(|| {
+    //         println!("{}", "Failed to insert document.");
+    //     }
+    // );
     // // Find the document and receive a cursor
     // let mut cursor = coll.find(Some(doc.clone()), None)
     //     .ok().expect("Failed to execute find.");
@@ -222,39 +246,51 @@ fn write_to_mongo(db_conf: &DBConfig, data: Vec<AnalyzeResult>){
     // }
 }
 
-fn read_analyze_dir(dir_path: &str, db_conf: DBConfig) {
-
+/// 对目录中的文件进行分析
+fn read_analyze_dir(dir_path: &str, db_conf: DBConfig, is_mutli_thread: bool) {
+    println!("dir name: {:?}", dir_path);
     let dir = Path::new(dir_path);
-    // 提供一个 vector 来存放所创建的子线程（children）。
+    // // 提供一个 vector 来存放所创建的子线程（children）。
     let mut children = vec![];
 
     for entry in read_dir(dir).unwrap(){
         let p: PathBuf = entry.unwrap().path();
         if p.is_file() {
-            let ext = p.extension().unwrap();
-            if ext.to_str().unwrap().to_lowercase() == "sql" {
-                let conf = db_conf.clone();
-                // 启用多线程的方式进行文件分析
-                // 启动（spin up）另一个线程
-                children.push(thread::spawn(move || {
-                    let f_path = p.to_str().unwrap();
-                    read_analyze_file(&f_path, &conf);
-                }));
+            let ext = p.extension();
+            if !ext.is_none() {
+                if ext.unwrap().to_str().unwrap().to_lowercase() == "sql" {
+                    
+                    if is_mutli_thread {
+                        let conf = db_conf.clone();
+                        // 启用多线程的方式进行文件分析
+                        // 启动（spin up）另一个线程
+                        children.push(thread::spawn(move || {
+                            let f_path = p.to_str().unwrap();
+                            read_analyze_file(&f_path, &conf);
+                        }));
+                    }
+                    else{
+                        let f_path = p.to_str().unwrap();
+                        // println!("开始分析文件:{:?}.", f_path);
+                        read_analyze_file(f_path, &db_conf);
+                    }
+                }
+                else{
+                    println!("文件 {:?} 不属于要分析的文件", p);
+                }
             }
-            else{
-                println!("文件 {:?} 不属于要分析的文件", p);
-            }
+            
         }
     }
 
-    // 
-    for child in children {
-        // 等待线程结束。返回一个结果。
-        let _ = child.join();
+    if is_mutli_thread {
+        // 等待线程结束
+        for child in children {
+            // 等待线程结束。返回一个结果。
+            let _ = child.join();
+        }
     }
-
-    println!("{:?}", db_conf);
-
+    
 }
 
 fn main() {
@@ -265,7 +301,7 @@ fn main() {
     // write_to_mongo(c.database);
     let f_path = "/users/shaipe/binlog";
     // let f_path = "/users/shaipe/react.sh";
-    read_analyze_dir(&f_path, c.database);
+    read_analyze_dir(&f_path, c.database, false);
     let end = time::now(); //获取结束时间
     println!(
         "done!start : {:?},end :{:?},duration:{:?}",
