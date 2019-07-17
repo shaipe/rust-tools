@@ -3,19 +3,19 @@ use std::io::prelude::*;
 use serde_derive::Deserialize;
 
 /// binlog 日志分析工具配置信息
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Config {
     pub database: DBConfig,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum DatabaseType {
     Mongo,
     Mysql
 }
 
 /// mongo数据库配置
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DBConfig {
     // 服务器地址
     pub server: String,
