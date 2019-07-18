@@ -23,6 +23,9 @@ use std::thread;
 mod config;
 use config::{Config, DBConfig};
 
+mod queue;
+use queue::Queue;
+
 /// binlog日志分析结果
 #[derive(Clone, Debug)]
 struct AnalyzeResult {
@@ -203,6 +206,12 @@ fn read_analyze_file(file_path: &str, db_conf: &DBConfig) {
     println!("文件 {:?} 分析结束, 总行数, {:?}", file_path, count);
 }
 
+/// 
+static mut SQL_QUEUE: Option<Queue<AnalyzeResult>> = None;
+
+/// 是否完成
+static mut COMPLETED: bool = false;
+
 /// 写入mongodb
 fn write_to_mongo(db_conf: &DBConfig, data: Vec<AnalyzeResult>){
 
@@ -213,18 +222,45 @@ fn write_to_mongo(db_conf: &DBConfig, data: Vec<AnalyzeResult>){
 
     let coll = client.db(&db_conf.database).collection("logs");
 
-    let mut docs: Vec<Document> = vec![];
-    for ar in data {
-        docs.push(ar.to_doc());
-    }
-    // let doc = doc! {
-    //     "title": "Jaws",
-    //     "array": [ 1, 2, 3 ],
-    // };
+    unsafe {
+        while !COMPLETED {
+            let t_q = &SQL_QUEUE;
+            if !t_q.is_none(){
+                let que: Option<Queue<AnalyzeResult>> = SQL_QUEUE;
+                let mut q = que.unwrap();
+                for _ in 0..q.len() {
+                    let mut docs: Vec<Document> = vec![];
+                    let ar = &q.pop();
+                    docs.push(ar.to_doc());
+                    // for ar in que.pop() {
+                    //     docs.push(ar.to_doc());
+                    // }
 
-    // Insert document into 'test.movies' collection
-    coll.insert_many(docs.clone(), None)
-            .ok(); //.expect("Failed to insert document.");
+                    // Insert document into 'test.movies' collection
+                    coll.insert_many(docs.clone(), None)
+                            .ok();
+                }
+                
+            }
+            else{
+                // 没有数据时休息200ms
+                thread::sleep(std::time::Duration::from_micros(200));
+            }
+        }
+    }
+    
+    // let mut docs: Vec<Document> = vec![];
+    // for ar in data {
+    //     docs.push(ar.to_doc());
+    // }
+    // // let doc = doc! {
+    // //     "title": "Jaws",
+    // //     "array": [ 1, 2, 3 ],
+    // // };
+
+    // // Insert document into 'test.movies' collection
+    // coll.insert_many(docs.clone(), None)
+    //         .ok(); //.expect("Failed to insert document.");
 
     // client
     // std::panic::catch_unwind(|| {
@@ -291,15 +327,28 @@ fn read_analyze_dir(dir_path: &str, db_conf: DBConfig, is_mutli_thread: bool) {
             // 等待线程结束。返回一个结果。
             let _ = child.join();
         }
+        unsafe {
+            COMPLETED = true;
+        }
     }
     
 }
 
 fn main() {
     let c = Config::new("config.json");
-
+    let cc = c.clone();
     let start = time::now(); //获取开始时间
+
+    unsafe{
+        SQL_QUEUE = Some(Queue::new());
+    }
+
+    // 启动一个线程来处理待插入数据库的队列
+    thread::spawn(move || {
+        write_to_mongo(&cc.clone().database, vec![]);
+    });
     
+
     // write_to_mongo(c.database);
     let f_path = c.root_dir; // "/users/shaipe/binlog";
     // let f_path = "/users/shaipe/react.sh";
