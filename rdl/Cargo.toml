@@ -1,0 +1,14 @@
+[package]
+name = "rdl"
+version = "0.1.0"
+authors = ["Shaipe <Shaipe@sina.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+time="*"
+
+[lib]
+name="rdl"
+crate-type=["dylib"]
