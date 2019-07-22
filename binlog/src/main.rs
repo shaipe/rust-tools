@@ -226,20 +226,22 @@ fn write_to_mongo(db_conf: &DBConfig, data: Vec<AnalyzeResult>){
         while !COMPLETED {
             let t_q = &SQL_QUEUE;
             if !t_q.is_none(){
-                let que: Option<Queue<AnalyzeResult>> = SQL_QUEUE;
-                let mut q = que.unwrap();
-                for _ in 0..q.len() {
-                    let mut docs: Vec<Document> = vec![];
-                    let ar = &q.pop();
-                    docs.push(ar.to_doc());
-                    // for ar in que.pop() {
-                    //     docs.push(ar.to_doc());
-                    // }
+                // let x = SQL_QUEUE.unwrap();
 
-                    // Insert document into 'test.movies' collection
-                    coll.insert_many(docs.clone(), None)
-                            .ok();
-                }
+                // let que: Option<Queue<AnalyzeResult>> = SQL_QUEUE;
+                // let mut q = que.unwrap();
+                // for _ in 0..q.len() {
+                //     let mut docs: Vec<Document> = vec![];
+                //     let ar = &q.pop();
+                //     docs.push(ar.to_doc());
+                //     // for ar in que.pop() {
+                //     //     docs.push(ar.to_doc());
+                //     // }
+
+                //     // Insert document into 'test.movies' collection
+                //     coll.insert_many(docs.clone(), None)
+                //             .ok();
+                // }
                 
             }
             else{

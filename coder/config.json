@@ -1,0 +1,11 @@
+{
+    "title": "coder-代码生成器",
+    "database": {
+        "db_type": "mysql",
+        "server": "localhost",
+        "user": "root",
+        "password": "mysql.root",
+        "db_name": "ehr",
+        "port":3306
+    }
+}
