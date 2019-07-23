@@ -25,7 +25,7 @@ namespace rdl_test
 
     class StringArguments
     {
-        [DllImport("ecf_core", EntryPoint = "how_many_characters")]
+        [DllImport("rdl", EntryPoint = "how_many_characters")]
         public static extern uint HowManyCharacters(string s);
 
         static public void xain()
@@ -37,32 +37,35 @@ namespace rdl_test
 
     class Program
     {
-        [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("rdl.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void process();
 
-        [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("rdl.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern string test(string text);
 
-        [DllImport("ecf_core.dll")]
+        [DllImport("rdl.dll")]
         private static extern Int32 add_numbers(Int32 number1, Int32 number2);
 
-        //[DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        //[DllImport("rdl.dll", CallingConvention = CallingConvention.Cdecl)]
         //public static extern bool verify_form_sign(string url_params, string secret);
 
-        //[DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        //[DllImport("rdl.dll", CallingConvention = CallingConvention.Cdecl)]
         //public static extern string md5(string text);
-        [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("rdl.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern string string_from_rust(string s);
 
-        [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("rdl.dll", CallingConvention = CallingConvention.Cdecl)]
         static extern void printc(string str);
 
 
-        [DllImport("ecf_core.dll")]
+        [DllImport("rdl.dll")]
         private static extern SampleStruct get_simple_struct();
 
-        [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("rdl.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern Int32 count_substrings(string value, string substr);
+
+        [DllImport("rdl.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern Boolean verify_test(string value, string substr);
 
         static void Main(string[] args)
         {
@@ -70,6 +73,8 @@ namespace rdl_test
             watch.Start();
 
             Console.WriteLine(count_substrings("banana", "na"));
+
+            Console.WriteLine(verify_test("banana", "banana"));
 
             printc("testxxxx sdsd");
 

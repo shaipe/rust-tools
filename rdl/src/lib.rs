@@ -1,10 +1,10 @@
-extern crate libc;
+// extern crate libc;
 
 use std::{thread, str};
 //external crates
-// use std::os::raw::c_char;
+use std::os::raw::c_char;
 use std::ffi::CString;
-use libc::{c_char};
+// use libc::{c_char};
 use std::ffi::CStr;
 
 /// 性能测试
@@ -113,7 +113,16 @@ pub extern fn how_many_characters(s: *const c_char) -> u32 {
     r_str.chars().count() as u32
 }
 
+/// 字符比较相等
+#[no_mangle]
+pub extern fn verify_test(source: *const c_char, targets: *const c_char) -> bool {
+    let c_value = unsafe { CStr::from_ptr(source).to_bytes() };
+    let c_substr = unsafe { CStr::from_ptr(targets).to_bytes() };
 
+    c_value == c_substr
+}
+
+/// 判断字符是否包含子字符
 #[no_mangle]
 pub extern "C" fn count_substrings(value: *const c_char, substr: *const c_char) -> i32 {
     let c_value = unsafe { CStr::from_ptr(value).to_bytes() };
