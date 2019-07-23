@@ -1,6 +1,6 @@
 {
-    "src": "/users/shaipe",
-    "dist": "/users/shaipe/dist",
+    "src": "/users/shaipe/dist",
+    "dist": "/users/shaipe",
     "exclude_dir": [],
     "clear": false,
     "exclude_ext": [],
