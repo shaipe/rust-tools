@@ -23,6 +23,18 @@ namespace rdl_test
         public byte isbool;
     }
 
+    class StringArguments
+    {
+        [DllImport("ecf_core", EntryPoint = "how_many_characters")]
+        public static extern uint HowManyCharacters(string s);
+
+        static public void xain()
+        {
+            var count = StringArguments.HowManyCharacters("göes to élevên");
+            Console.WriteLine(count);
+        }
+    }
+
     class Program
     {
         [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -40,7 +52,7 @@ namespace rdl_test
         //[DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
         //public static extern string md5(string text);
         [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern string string_from_rust();
+        public static extern string string_from_rust(string s);
 
         [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
         static extern void printc(string str);
@@ -49,10 +61,15 @@ namespace rdl_test
         [DllImport("ecf_core.dll")]
         private static extern SampleStruct get_simple_struct();
 
+        [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern Int32 count_substrings(string value, string substr);
+
         static void Main(string[] args)
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
+
+            Console.WriteLine(count_substrings("banana", "na"));
 
             printc("testxxxx sdsd");
 
@@ -62,7 +79,7 @@ namespace rdl_test
 
 
 
-            string xss = string_from_rust();
+            string xss = string_from_rust("this is a test");
             Console.WriteLine(xss);
 
             string ss = "appId=4a364f2d1f1fb842&fromFKFlag=1&FromFKId=18022&method=vast.order.retreat.count&proprietor=2&proprietorId=747&timestamp=1563524211&Token=4B38F1DF6FF1A96C2B30C18D4EB4B340B9D2DE9D34AB8BA38BD9D144739E76570D00955D2FFF001B4AEFB019A23CED33264AC72CB92114C67A25E2EF3A62B98E5109A77C22798FFA7F807032912BAAE8DD1CFCFA07C477796BA9DB949ACAF68DA080681DAAC3AC82C03EC78583B072A807A879DFB5B2A007BB8AFB49662487DAEDE44C34E684867FDB2B3561F23B57E28D94444D6B790E9045755D3C3F05DE017EC2436C993464B457A126E43B54D23450BFA1DCA0296E8CAC650E35A98E215AAA50B5514EDAF09BDAD6CDE650FB77FCEAA721667F7F267BA444900A9114B59595AC0C8ED6E4666995B79A0AD6B45DBEC559BCF9A58CB91D7FE5733C7D64038E1A532DC72A0A1EF19A230E14D846F5D5D2375D358EE66BEA&v=3.0&secret=0a2b7ae94a364f2d1f1fb8423e9efd00";
