@@ -97,13 +97,15 @@ fn walk_dir(dir: &Path, file: &mut File) {
             walk_dir(&path, file);
         }
         else{
-
-            let path_str = path.display();
-            let display = format!("{:?}\n", path_str);
+            
+            // let dir_str = format!("{:?}\n", dir.display());
+            let path_str = path.file_name().unwrap();
+            // let display = format!("{:?}", path_str);
+            let display = format!("{:?}", path_str);// .replace(dir_str.as_str(), "")
             // println!("{:?}", format!("{:?}", path_str).find("_"));
             if display.find("_").is_none() {
                 // println!("{}", path.display());
-                match file.write_all(display.as_bytes()) {
+                match file.write_all(format!("{}\n", display).as_bytes()) {
                     Err(why) => {
                         panic!("couldn't write to : {}", why.description())
                     },
