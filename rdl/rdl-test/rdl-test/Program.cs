@@ -17,6 +17,12 @@ namespace rdl_test
         public Int32 field_two;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct test
+    {
+        public byte isbool;
+    }
+
     class Program
     {
         [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -35,7 +41,9 @@ namespace rdl_test
         //public static extern string md5(string text);
         [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern string string_from_rust();
-        
+
+        [DllImport("ecf_core.dll", CallingConvention = CallingConvention.Cdecl)]
+        static extern void printc(string str);
 
 
         [DllImport("ecf_core.dll")]
@@ -46,9 +54,13 @@ namespace rdl_test
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
+            printc("testxxxx sdsd");
+
             var simple_struct = get_simple_struct();
             Console.WriteLine(simple_struct.field_one);
             Console.WriteLine(simple_struct.field_two);
+
+
 
             string xss = string_from_rust();
             Console.WriteLine(xss);
