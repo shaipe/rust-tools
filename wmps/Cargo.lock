@@ -119,6 +119,7 @@ dependencies = [
 name = "wmps"
 version = "0.1.0"
 dependencies = [
+ "winapi 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "windows-service 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

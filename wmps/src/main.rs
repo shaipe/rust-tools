@@ -12,6 +12,8 @@
 // Ping server sends a text message to local UDP port 1234 once a second.
 // You can verify that service works by running netcat, i.e: `ncat -ul 1234`.
 
+mod file_monitor;
+
 #[cfg(windows)]
 fn main() -> windows_service::Result<()> {
     ping_service::run()
