@@ -1,0 +1,43 @@
+#实现了限制日志文件大小为1024Byte的功能。
+appenders:
+  stdout:
+    kind: console
+  requests:
+    kind: file
+    path: "log/requests.log"
+    encoder:
+      pattern: "{d} [{t}] {l} {M}:{m}{n}"
+ ################################################## 
+ # 定义rooling_file的appenders
+  roll:
+    kind: rolling_file
+    path: "log/roll.log"
+    append: true
+    encoder: 
+      kind: pattern
+    policy:
+      kind: compound
+      trigger: 
+        kind: size
+        #限制大小为1024Byte
+        limit: 1024 
+        
+      roller:
+        kind: delete
+        #回滚方式为直接删除
+  ##################################################
+  
+root:
+  level: info
+  appenders:
+    #使用roll appenders
+    - roll
+    
+loggers:
+  app::backend::db:
+    level: info
+  app::requests:
+    level: info
+    appenders:
+      - requests
+    additive: false

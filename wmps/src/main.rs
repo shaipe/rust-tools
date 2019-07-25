@@ -14,8 +14,13 @@
 
 // mod file_monitor;
 
+#[macro_use]
+extern crate log;
+extern crate log4rs;
+
 #[cfg(windows)]
 fn main() -> windows_service::Result<()> {
+    info!("service start!");
     ping_service::run()
 }
 
