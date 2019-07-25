@@ -1,6 +1,6 @@
 {
-    "src": "/users/shaipe/dist",
-    "dist": "/users/shaipe",
+    "src": "F:\\rust\\ecf-core\\src",
+    "dist": "F:\\rust\\ecf-core",
     "exclude_dir": [],
     "clear": false,
     "exclude_ext": [],
