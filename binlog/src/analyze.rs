@@ -6,21 +6,24 @@ use std::thread;
 use chrono::{DateTime, FixedOffset};
 
 use crate::analyze_result::AnalyzeResult;
+use crate::dbase::DBase;
 
 pub struct Analyze {
-    pub dir: String
+    pub dir: String,
+    pub db: DBase
 }
 
 impl Analyze {
 
-    pub fn new(dir_str: &str) -> Self {
+    pub fn new(dir_str: &str, db: DBase) -> Self {
         Analyze {
-            dir: dir_str.to_string()
+            dir: dir_str.to_string(),
+            db: db
         }
     }
 
     /// 读文件,按行读取
-    pub fn analyze_files(&self, file_path: &str) {
+    pub fn analyze_file(&self, file_path: &str) {
 
         println!("开始对文件{:?}进行分析", file_path);
         let file = File::open(&file_path).expect("cannot open file");
@@ -128,13 +131,14 @@ impl Analyze {
         }
         // 将最后的结果写入数据库中
         // write_to_mongo(&db_conf.clone(), sqls);
+        self.db.insert(sqls);
         println!("文件 {:?} 分析结束, 总行数, {:?}", file_path, count);
     }
 
     /// 对目录中的文件进行分析
-    pub fn read_analyze_dir(&self, dir_path: &str, is_mutli_thread: bool) {
-        println!("dir name: {:?}", dir_path);
-        let dir = Path::new(dir_path);
+    pub fn read_analyze_dir(&self, is_mutli_thread: bool) {
+        println!("dir name: {:?}", self.dir);
+        let dir = Path::new(self.dir.as_str());
         // // 提供一个 vector 来存放所创建的子线程（children）。
         let mut children = vec![];
 
@@ -151,13 +155,13 @@ impl Analyze {
                             // // 启动（spin up）另一个线程
                             children.push(thread::spawn(move || {
                                 // let f_path = p.to_str().unwrap();
-                                // read_analyze_file(&f_path, &conf);
+                                // self.analyze_file(&f_path);
                             }));
                         }
                         else{
-                            // let f_path = p.to_str().unwrap();
+                            let f_path = p.to_str().unwrap();
                             // // println!("开始分析文件:{:?}.", f_path);
-                            // read_analyze_file(f_path, &db_conf);
+                            self.analyze_file(f_path);
                         }
                     }
                     else{
