@@ -12,7 +12,7 @@ mod analyze_result;
 mod dbase;
 
 pub use analyze_result::AnalyzeResult;
-// pub use analyze::Analyze;
+use analyze::read_analyze_dir;
 pub use config::Config;
 pub use queue::Queue;
 pub use convert::Convert;
@@ -25,7 +25,8 @@ fn main() {
     let c = Config::new("config.json");
     let cc = c.clone();
 
-    let _ = DBase::new(cc.database);
+    let db = DBase::new(cc.database);
+    read_analyze_dir(&c.root_dir, db, c.multi_thread);
 
     // unsafe{
     //     SQL_QUEUE = Some(Queue::new());

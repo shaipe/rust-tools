@@ -1,6 +1,6 @@
 {
     "root_dir": "/users/shaipe/binlog",
-    "multi_thread": false,
+    "multi_thread": true,
     
     "database":{
         "server": "localhost",
