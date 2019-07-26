@@ -35,7 +35,7 @@ fn main(){
                     // create_dir(ext_str);
                 }
                 let tf_str = t_dir_str + "/" + path.file_name().unwrap().to_str().unwrap();
-                println!("{:?}", tf_str);
+                println!("{:?}, {:?}", tf_str, path.display().unwrap());
             }
             else{
                 println!("file {:?} not extension!", path.display());
