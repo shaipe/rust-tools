@@ -9,18 +9,24 @@ mod queue;
 mod convert;
 mod analyze;
 mod analyze_result;
+mod dbase;
 
 pub use analyze_result::AnalyzeResult;
-pub use analyze::Analyze;
+use analyze::read_analyze_dir;
 pub use config::Config;
 pub use queue::Queue;
 pub use convert::Convert;
+use dbase::DBase;
 
 
 fn main() {
-    // let c = Config::new("config.json");
-    // let cc = c.clone();
+    
     let start = time::now(); //获取开始时间
+    let c = Config::new("config.json");
+    let cc = c.clone();
+
+    let db = DBase::new(cc.database);
+    read_analyze_dir(&c.root_dir, db, c.multi_thread);
 
     // unsafe{
     //     SQL_QUEUE = Some(Queue::new());

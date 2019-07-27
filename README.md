@@ -10,6 +10,22 @@
 
 以一个服务的形式放置于系统中,用于按设定的时间执行网络请求任务
 
+## binlog
+
+mysql数据库日志分析,把binlog日志转换为sql后,此工具体把sql文本文件转换成执行语句写入mongodb数据库中
+
+## coder
+
+一个代码生成器,可以根据mysql的数据库表结构进行代码生成
+
+## rdl
+
+用Rust写一个dll在C#中进行调用的测试
+
+## wmps
+
+用rust写一个windows 服务,在examples中有关于服务管理的工具.
+
 ## 学习资料
 
 - [Rust 学习指南 - Rust 高级结构](https://www.codemore.top/p/234853bd-4f89-3df9-ae18-994110faf023)
