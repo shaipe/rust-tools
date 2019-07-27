@@ -70,6 +70,7 @@ fn main(){
 
 }
 
+/// 创建文件并写入值,用于测试使用
 fn test_write_file() -> io::Result<()> {
     let filename = "foo.txt";
     let file = OpenOptions::new()

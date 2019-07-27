@@ -1,20 +1,38 @@
+/**
+ * 代码生成器
+ * by shaipe 20190727
+ */
 #[warn(unused_parens)]
 
 // #[macro_use]
 extern crate mysql;
 
 // use mysql::from_row;
+use std::env;
 
 mod config;
 mod field;
 
+/// 启动入口
 fn main() {
 
-    let c = config::Config::new("config.json");
+    let args: Vec<String> = env::args().collect();
+
+    // 获取启动输入的命令行参数值
+    let conf_path = if args.len() > 1 {
+        &args[1]
+    }
+    else{
+        "config.json"
+    };
+
+    // 获取配置信息
+    let c = config::Config::new(conf_path);
     println!("{:?}", c);
 
     let dbc = c.database;
 
+    // 组建连接字符串
     let conn_str = format!("mysql://{}:{}@{}:{}/{}", dbc.user, dbc.password, dbc.server, dbc.port, dbc.db_name);
 
     let dbs = field::get_databases(&conn_str);
