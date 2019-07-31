@@ -1,9 +1,9 @@
-Rust文件读写与复制
-Published: 2017-12-29
-By Yieldone
-tags: Rust
+// Rust文件读写与复制
+// Published: 2017-12-29
+// By Yieldone
+// tags: Rust
 
-（一）从文件按行读取内容，打印输出
+// （一）从文件按行读取内容，打印输出
 
 use std::io::{self, BufReader};
 use std::io::prelude::*;
@@ -27,9 +27,9 @@ fn main() {
         Err(err) => println!("zzz: {}", err)
     }
 }
-（二）将内容写入文件
+// （二）将内容写入文件
 
-打开文件可以指定多个参数，以下例子可读可写，create(true)是如果文件不存在则创建文件，存在则使用这个文件，create_new(true)的作用是，当文件存在时，会报错，Error { repr: Os { code: 17, message: "File exists" } }，不存在则新建文件，并且指定append追加写入，打开文件，将文件句柄赋值给file.
+// 打开文件可以指定多个参数，以下例子可读可写，create(true)是如果文件不存在则创建文件，存在则使用这个文件，create_new(true)的作用是，当文件存在时，会报错，Error { repr: Os { code: 17, message: "File exists" } }，不存在则新建文件，并且指定append追加写入，打开文件，将文件句柄赋值给file.
 
 use std::io;
 use std::io::prelude::*;
@@ -62,9 +62,9 @@ fn main() {
         Err(err) => println!("zzz: {}", err)
     }
 }
-（三）获取目录列表
+// （三）获取目录列表
 
-对文件进行操作，很可能会读取目录列表，使用fs::read_dir方法，可以获取目录列表及文件相关属性
+// 对文件进行操作，很可能会读取目录列表，使用fs::read_dir方法，可以获取目录列表及文件相关属性
 
 use std::fs;
 
@@ -84,9 +84,9 @@ fn run() {
 fn main() {
     run();
 }
-（四）复制文件
+// （四）复制文件
 
-在本例中，复制指定文件，并放在指定文件夹(funny)下，文件命名为“funny_1514532002.db”，后边的数字为时间戳
+// 在本例中，复制指定文件，并放在指定文件夹(funny)下，文件命名为“funny_1514532002.db”，后边的数字为时间戳
 
 use std::fs;
 use std::io;
