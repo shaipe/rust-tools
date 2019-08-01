@@ -1,17 +1,13 @@
-extern crate hyper;
+extern crate url;
+#[cfg(feature = "http")]
+extern crate reqwest;
 
-use hyper::{Method, Request, Body, header::HeaderValue};
+mod page;
+mod website;
+mod configuration;
+mod robots;
+
 
 fn main() {
-    let json = r#"{"library":"hyper"}"#;
-    let uri: hyper::Uri = "http://httpbin.org/post".parse().unwrap();
-    let mut req = Request::new(Body::from(json));
-    *req.method_mut() = Method::POST;
-    *req.uri_mut() = uri.clone();
-    let x = req.headers_mut().insert(
-        hyper::header::CONTENT_TYPE,
-        HeaderValue::from_static("application/json")
-    );
-
-    println!("{:?}", x);
+    println!("sdfsdf");
 }

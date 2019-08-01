@@ -10,8 +10,10 @@ Rust 爬虫
 - html5ever：Rust html解析库 https://github.com/servo/html5ever
 - select :基于html5ever 的html解析库，类似于python的 beautifulsoap https://github.com/utkarshkukreti/select.rs
 crates.io https://crates.io/crates/select
-- reqwest : rust http client实现 https://github.com/seanmonstar/reqwest
+- reqwest : [rust http client实现](https://github.com/seanmonstar/reqwest)
+- [scraper](https://crates.io/crates/scraper)
 
 ### 参考文档
 
+- [scraper](https://crates.io/crates/scraper)
 - 
