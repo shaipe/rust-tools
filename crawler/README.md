@@ -16,4 +16,6 @@ crates.io https://crates.io/crates/select
 ### 参考文档
 
 - [scraper](https://crates.io/crates/scraper)
-- 
+- [spider](https://github.com/madeindjs/spider)
+- [url-scraper](https://github.com/pop-os/url-scraper)
+- [fselect](https://github.com/jhspetersson/fselect)
