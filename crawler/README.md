@@ -19,3 +19,5 @@ crates.io https://crates.io/crates/select
 - [spider](https://github.com/madeindjs/spider)
 - [url-scraper](https://github.com/pop-os/url-scraper)
 - [fselect](https://github.com/jhspetersson/fselect)
+- [reqwest-demo](http://siciarz.net/24-days-rust-reqwest/)
+- [reqwest-demo](https://rust-lang-nursery.github.io/rust-cookbook/web/clients/apis.html)
