@@ -10,11 +10,12 @@ edition = "2018"
 # hyper = "0.12"
 # select = "0.4.3"
 # html5ever = "0.24"
-url = "1"
+url = "2"
 scraper = "0.10.1"
 serde="*"
 serde_json="*"
 serde_derive="*"
+percent-encoding="2.0"
 
 [dependencies.reqwest]
 version = "0.9"

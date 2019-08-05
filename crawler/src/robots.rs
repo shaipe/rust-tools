@@ -58,6 +58,7 @@ struct RuleLine<'a> {
     allowance: bool,
 }
 
+/// 请求率
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct RequestRate {
     pub requests: usize,
@@ -87,8 +88,9 @@ pub struct RobotFileParser<'a> {
     last_checked: Cell<i64>,
 }
 
-
+/// 行规则
 impl<'a> RuleLine<'a> {
+    /// 新建一个规则
     fn new<S>(path: S, allowance: bool) -> RuleLine<'a>
         where S: Into<Cow<'a, str>>
     {
@@ -249,7 +251,7 @@ impl<'a> RobotFileParser<'a> {
     /// Reads the robots.txt URL and feeds it to the parser.
     pub fn read(&self) {
         let client = Client::new();
-        let request = client.get(self.url.clone());
+        let request = client.get(self.url.clone().as_str());
         let request = request.header(USER_AGENT, RP_USER_AGENT.to_owned());
         let mut res = match request.send() {
             Ok(res) => res,
@@ -300,7 +302,7 @@ impl<'a> RobotFileParser<'a> {
     /// one or more blank lines.
     ///
     pub fn parse<T: AsRef<str>>(&self, lines: &[T]) {
-        use url::percent_encoding::percent_decode;
+        use percent_encoding::percent_decode;
 
         // states:
         //   0: start state
@@ -401,7 +403,7 @@ impl<'a> RobotFileParser<'a> {
 
     /// Using the parsed robots.txt decide if useragent can fetch url
     pub fn can_fetch<T: AsRef<str>>(&self, useragent: T, url: T) -> bool {
-        use url::percent_encoding::percent_decode;
+        use percent_encoding::percent_decode;
 
         let useragent = useragent.as_ref();
         let url = url.as_ref();

@@ -1,8 +1,8 @@
-use page::Page;
+use crate::page::Page;
 use std::thread;
 use std::thread::JoinHandle;
-use configuration::Configuration;
-use robotparser::RobotFileParser;
+use crate::configuration::Configuration;
+use crate::robots::RobotFileParser;
 
 /// Represent a website to scrawl. To start crawling, instanciate a new `struct` using
 /// <pre>

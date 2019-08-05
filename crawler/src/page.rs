@@ -1,6 +1,7 @@
 use scraper::{Html, Selector};
 use reqwest;
 use std::io::Read;
+use url::Url;
 
 /// Represent a page visited. This page contains HTML scraped with [scraper](https://crates.io/crates/scraper).
 ///
@@ -11,6 +12,9 @@ pub struct Page {
     url: String,
     /// HTML parsed with [scraper](https://crates.io/crates/scraper) lib
     html: String,
+
+    // 当前链接的host
+    host: String,
 }
 
 impl Page {
@@ -20,18 +24,27 @@ impl Page {
         let mut res = reqwest::get(url).unwrap();
         let mut body = String::new();
         res.read_to_string(&mut body).unwrap();
+        let parsed_url = Url::parse(url.as_ref()).unwrap();
+        let host_str = parsed_url.host_str().unwrap().to_owned();
 
         Self {
             url: url.to_string(),
             html: body,
+            host: host_str.to_string()
         }
     }
 
+    
+
     /// Instanciate a new page without scraping it (used for testing purposes)
     pub fn build(url: &str, html: &str) -> Self {
+        let parsed_url = Url::parse(url.as_ref()).unwrap();
+        let host_str = parsed_url.host_str().unwrap().to_owned();
+
         Self {
             url: url.to_string(),
             html: html.to_string(),
+            host: host_str.to_string()
         }
     }
 
@@ -58,12 +71,27 @@ impl Page {
             match element.value().attr("href") {
                 Some(href) => {
 
-                    // Keep only links for this domains
-                    match href.find('/') {
-                        Some(0) => urls.push(format!("{}{}", domain, href)),
-                        Some(_) => (),
-                        None => (),
-                    };
+                    if href.starts_with("//"){
+                        // 
+                        match href.find(self.host.as_str()) {
+                            Some(_) => {
+                                let new_href = href.replace(self.host.as_str(), "");
+                                // println!("{:?}", new_href);
+                                if new_href != "//"{
+                                    urls.push(format!("{}{}", domain, new_href.replace("///", "/")))
+                                }
+                            },
+                            None => (),
+                        };
+                    }
+                    else{
+                        // Keep only links for this domains
+                        match href.find('/') {
+                            Some(0) => urls.push(format!("{}{}", domain, href)),
+                            Some(_) => (),
+                            None => (),
+                        };
+                    }                    
                 }
                 None => (),
             };
