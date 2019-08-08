@@ -1,0 +1,15 @@
+{
+    "name": "计划任务配置",
+    "tasks": [
+        {
+            "name": "计划任务配置",
+            "type": "request",
+            "request": {
+                "url": "",
+                "method": "POST",
+                "data": "{\"databaseId\":22,\"appid\":\"tts_app\",\"method\":\"sch.overall.exec\"}"
+            }
+        }
+    ]
+    
+}
