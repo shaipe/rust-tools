@@ -1,3 +1,5 @@
+/// 对iis日志进行分析处理,去除指定的ip段请求
+
 use std::env;
 use std::fs::{File};
 use std::io::{BufRead, BufReader};
@@ -15,6 +17,7 @@ fn main() {
         panic!("please input file path!");
     };
 
+    // 目标文件
     let dist_path = if args.len() > 2 {
         &args[2]
     }
@@ -22,6 +25,24 @@ fn main() {
         "result.log"
     };
 
+    // 处理类型,默认为单文件处理
+    let deal_type = if args.len() > 3 {
+        &args[3]
+    }
+    else{
+        "file"
+    }
+
+    
+
+    println!("{}", file_path);
+}
+
+fn deal_dir(src_dir: &str, dist_dir: &str) {
+    
+}
+
+fn deal_file(file_path: &str, dist_path: &str){
     let file = match File::open(file_path) {
         Ok(file) => file,
         Err(e) => panic!("error {:?}", e)
@@ -50,6 +71,4 @@ fn main() {
         }
        
     }
-
-    println!("{}", file_path);
 }
