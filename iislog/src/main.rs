@@ -1,10 +1,12 @@
 /// 对iis日志进行分析处理,去除指定的ip段请求
 
 use std::env;
-use std::fs::{File};
+use std::fs::{File, read_dir};
 use std::io::{BufRead, BufReader};
 use regex::Regex;
 use std::io::prelude::*;
+use std::path::{Path, PathBuf};
+use std::thread;
 
 fn main() {
     let args : Vec<String> = env::args().collect();
@@ -38,10 +40,49 @@ fn main() {
     println!("{}", file_path);
 }
 
-fn deal_dir(src_dir: &str, dist_dir: &str) {
-    
+/// 对目录进行处理
+fn deal_dir(src_dir: &str, dist_dir: &str, is_mutli_thread: bool = true) {
+     
+     // // 提供一个 vector 来存放所创建的子线程（children）。
+    let mut children = vec![];
+     
+     for entry in read_dir(dir).unwrap(){
+        let p: PathBuf = entry.unwrap().path();
+        if p.is_file() {
+            let ext = p.extension();
+            if !ext.is_none() {
+                if ext.unwrap().to_str().unwrap().to_lowercase() == "sql" {
+                    
+                    if is_mutli_thread {
+                        let mdb = db.clone();
+                        // // 启用多线程的方式进行文件分析
+                        // // 启动（spin up）另一个线程
+                        children.push(thread::spawn( move || {
+                            let fi_path = p.to_str().unwrap();
+                            // let my = self.clone();
+                            analyze_file(&mdb, fi_path);
+                        }));
+                    }
+                    else{
+                        let f_path = p.to_str().unwrap();
+                        // // println!("开始分析文件:{:?}.", f_path);
+                        analyze_file(&db, f_path);
+                    }
+                }
+            }
+        }
+     }
+
+     if is_mutli_thread {
+        // 等待线程结束
+        for child in children {
+            // 等待线程结束。返回一个结果。
+            let _ = child.join();
+        }
+    }
 }
 
+/// 对单个文件进行处理
 fn deal_file(file_path: &str, dist_path: &str){
     let file = match File::open(file_path) {
         Ok(file) => file,
