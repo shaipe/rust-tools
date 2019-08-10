@@ -33,40 +33,47 @@ fn main() {
     }
     else{
         "file"
+    };
+
+    // 对数据开始处理
+    if deal_type == "file" {
+        deal_file(&file_path, &dist_path);
     }
-
+    else{
+        deal_dir(&file_path, &dist_path, true);
+    }
     
-
     println!("{}", file_path);
 }
 
 /// 对目录进行处理
-fn deal_dir(src_dir: &str, dist_dir: &str, is_mutli_thread: bool = true) {
+fn deal_dir(src_dir: &str, dist_dir: &str, is_mutli_thread: bool) {
      
      // // 提供一个 vector 来存放所创建的子线程（children）。
     let mut children = vec![];
      
-     for entry in read_dir(dir).unwrap(){
+     for entry in read_dir(src_dir).unwrap(){
         let p: PathBuf = entry.unwrap().path();
         if p.is_file() {
             let ext = p.extension();
             if !ext.is_none() {
-                if ext.unwrap().to_str().unwrap().to_lowercase() == "sql" {
+                if ext.unwrap().to_str().unwrap().to_lowercase() == "log" {
+                    let dist_file = format!("{:?}/{:?}", dist_dir.to_owned() , p.clone().file_name());
                     
                     if is_mutli_thread {
-                        let mdb = db.clone();
+                        
                         // // 启用多线程的方式进行文件分析
                         // // 启动（spin up）另一个线程
                         children.push(thread::spawn( move || {
                             let fi_path = p.to_str().unwrap();
                             // let my = self.clone();
-                            analyze_file(&mdb, fi_path);
+                            deal_file(&fi_path, &dist_file);
                         }));
                     }
                     else{
-                        let f_path = p.to_str().unwrap();
+                        let fi_path = p.to_str().unwrap();
                         // // println!("开始分析文件:{:?}.", f_path);
-                        analyze_file(&db, f_path);
+                        deal_file(&fi_path, &dist_file);
                     }
                 }
             }
