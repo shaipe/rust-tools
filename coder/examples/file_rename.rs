@@ -1,6 +1,8 @@
 /**
  * 文件重命名
  * by shaipe 20190729
+ * 参数说明,1: 待处理目录, 2: 待替换文件类型, 3: 替换为xx类型
+ * ./file_rename ./ mp4 mp
  */
 
 use std::env;

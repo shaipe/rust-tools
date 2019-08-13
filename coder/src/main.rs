@@ -11,10 +11,19 @@ extern crate mysql;
 use std::env;
 
 mod config;
-mod field;
+mod lang;
+
+mod dbase;
+mod table;
+mod column;
+
 // mod xx;
 mod mod_x;
 // use mod_x::test::xte;
+
+use dbase::Database;
+// use column::{get_databases, get_columns};
+
 
 
 /// 启动入口
@@ -39,18 +48,26 @@ fn main() {
     // 组建连接字符串
     let conn_str = format!("mysql://{}:{}@{}:{}/{}", dbc.user, dbc.password, dbc.server, dbc.port, dbc.db_name);
 
-    let dbs = field::get_databases(&conn_str);
-    println!("{:?}", dbs);
+    let db = Database::new(&dbc.db_name, &conn_str);
 
-    let cls = field::get_columns(&conn_str, "ehr_category", &dbc.db_name);
+    let tb = db.get_talbe("ehr_category");
 
-    println!("{:?}", cls);
+    let cols = tb.get_columns();
 
-    let pool = mysql::Pool::new(conn_str).unwrap();
+    println!("{:?}", cols);
 
-    for row in pool.prep_exec("Select * from ehr_category", ()).unwrap() {
-        println!("{:?}", row);
-    }
+    // let dbs = get_databases(&conn_str);
+    // println!("{:?}", dbs);
+
+    // let cls = get_columns(&conn_str, "ehr_category", &dbc.db_name);
+
+    // println!("{:?}", cls);
+
+    // let pool = mysql::Pool::new(conn_str).unwrap();
+
+    // for row in pool.prep_exec("Select * from ehr_category", ()).unwrap() {
+    //     println!("{:?}", row);
+    // }
     
     // .map(| mut result| {
     //     let row = result.next().unwrap().unwrap();
