@@ -1,8 +1,8 @@
 /**
  * 文件重命名
  * by shaipe 20190729
- * 参数说明,1: 待处理目录, 2: 待替换文件类型, 3: 替换为xx类型
- * ./file_rename ./ mp4 mp
+ * 参数说明,1: 待替换文件类型, 2: 替换为xx类型 3: 待处理目录
+ * ./file_rename mp4 mp ./
  */
 
 use std::env;
@@ -14,28 +14,30 @@ use std::fs::rename;
 /// 入口函数
 fn main() {
     let args: Vec<String> = env::args().collect();
-    // 源目录
-    let src_dir = if args.len() > 1 {
-        &args[1]
-    }
-    else{
-        "./"
-    };
+    
 
     // 待修改的文件类型
-    let src_ext = if args.len() > 2 {
-        &args[2]
+    let src_ext = if args.len() > 1 {
+        &args[1]
     }
     else{
         "txt"
     };
 
     // 给定修修改为的目录文件类型
-    let dist_ext = if args.len() > 3 {
-        &args[3]
+    let dist_ext = if args.len() > 2 {
+        &args[2]
     }
     else{
         "log"
+    };
+
+    // 源目录
+    let src_dir = if args.len() > 3 {
+        &args[3]
+    }
+    else{
+        "./"
     };
 
     // let dist_dir = if args.len() > 4 {
