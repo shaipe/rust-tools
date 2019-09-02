@@ -141,6 +141,7 @@ pub fn analyze_file(db: &DBase, file_path: &str) {
                 // let ret_commment = Regex::new("/\\*.*?\\*/").unwrap();
                 let xline = line.replace("### ", "");
                 // let xline = ret_commment.replace(&xline, "");
+                
                 single_sql.push(xline);
             }
             // 一条日志记录结束的判断

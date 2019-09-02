@@ -58,7 +58,7 @@ fn get_create_sql(content: String) -> String {
                         res.push(") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n\n".to_owned());
                         structed = false;
                     }
-                    else {
+                    else if line.contains(":"){
                         let l = line.replace("pub ", "");
                         let f: Vec<&str> = l.split(":").collect();
                         let x: Vec<&str> = f[1].split(",").collect();
@@ -71,9 +71,7 @@ fn get_create_sql(content: String) -> String {
                         };
 
                         let lf: String = format!("  `{}` {} DEFAULT NULL COMMENT '{}',", f[0].trim(), get_data_type(x[0]), comment.trim());
-                        // let lf_str: &str = lf.as_str();
                         res.push(lf);
-                        // println!("{}", lf_str);
                     }
                 }
             }
@@ -85,9 +83,11 @@ fn get_create_sql(content: String) -> String {
 
 
 fn get_data_type(type_str: &str) -> String{
-    match type_str.trim() {
+    // println!("{}", type_str);
+    match type_str.to_lowercase().trim() {
         "i64" | "i32" => "INT(11)".to_owned(),
         "f64" | "f32" => "FLOAT(12,6)".to_owned(),
+        "datetime<local>" | "datetime<utc>" => "DateTime".to_owned(),
         _ => "VARCHAR(50)".to_owned()
     }
 }
