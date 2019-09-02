@@ -17,6 +17,10 @@ serde_json="1.0"
 [dependencies.mysql]
 version = "16.0.2"
 
+[dependencies.lane]
+path = "../../lane"
+version = "0.1.0"
+
 # 可以减少编译后的文件大小
 [profile.release]
 lto = true
