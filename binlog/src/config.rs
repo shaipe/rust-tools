@@ -7,7 +7,7 @@ use serde_derive::Deserialize;
 pub struct Config {
     // 数据库配置
     pub database: DBConfig,
-    
+
     // 分析日志的根目录
     pub root_dir: String,
 
@@ -21,6 +21,7 @@ pub enum DatabaseType {
     Mysql
 }
 
+
 /// mongo数据库配置
 #[derive(Debug, Deserialize, Clone)]
 pub struct DBConfig {
@@ -30,7 +31,7 @@ pub struct DBConfig {
     pub port: u16,
     // 数据库名称
     pub database: String,
-    
+
     pub db_type: DatabaseType
 }
 
