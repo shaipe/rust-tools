@@ -18,9 +18,18 @@ mysql数据库日志分析,把binlog日志转换为sql后,此工具体把sql文�
 
 一个代码生成器,可以根据mysql的数据库表结构进行代码生成
 
+
+
 ## rdl
 
 用Rust写一个dll在C#中进行调用的测试
+
+## tool 单个工具
+
+基于examples实现单一功能
+1. tust2sql: 提取Rust语言中的struct结构生成sql语句 --example 
+2. file_category: 对目录下的文件根据类型进行分类 
+3. file_rename: 对目录下的文件进行重重命名,支持正则替换
 
 ## wmps
 

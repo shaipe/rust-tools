@@ -1,6 +1,9 @@
 // #[macro_use]
 // extern crate log;
 // extern crate log4rs;
+/**
+ * 过滤文件类型
+ */
 
 use std::path::Path;
 use std::env;
