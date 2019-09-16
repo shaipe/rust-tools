@@ -153,7 +153,7 @@ fn get_data_type(type_str: &str) -> String{
     match type_str.to_lowercase().trim() {
         "i8" => "SMALLINT".to_owned(),
         "i64" | "i32" => "INT(11)".to_owned(),
-        "f64" | "f32" => "FLOAT(12,6)".to_owned(),
+        "f64" | "f32" => "FLOAT(26,6)".to_owned(),
         "datetime<local>" | "datetime<utc>" | "naivedatetime" => "DATETIME".to_owned(),
         "naivedate" => "DATE".to_owned(),
         _ => "VARCHAR(50)".to_owned()
