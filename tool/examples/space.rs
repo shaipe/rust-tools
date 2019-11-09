@@ -1,14 +1,25 @@
 use std::path::Path;
 use std::fs::read_dir;
-use time::*;
+// use time::*;
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    
+
+    // 待计算的空间路径
+    let dri_src = if args.len() > 1 {
+        &args[1]
+    }
+    else{
+        "./"
+    };
+
     let start = time::now();//获取开始时间
     // let s = get_file_size("/Users/shaipe/downloads/files/zip/证件照.zip");
-    let (s, x) = get_dir_size(Path::new("/Users/shaipe/documents"));
+    let (s, x) = get_dir_size(Path::new(dri_src));
     println!("files: {}, size: {:?}", x, format_size(s));
     let end = time::now();//获取结束时间
-    println!("done!start : {:?},end :{:?},duration:{:?}",start,end,end-start);
+    println!("done! {:?}", end-start);
 }
 
 /// 获取单个件占用空间大小
