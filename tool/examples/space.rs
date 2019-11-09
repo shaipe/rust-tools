@@ -1,11 +1,14 @@
 use std::path::Path;
 use std::fs::read_dir;
+use time::*;
 
 fn main() {
-
+    let start = time::now();//获取开始时间
     // let s = get_file_size("/Users/shaipe/downloads/files/zip/证件照.zip");
-    let s = get_dir_size(Path::new("/Users/shaipe/downloads/files/zip"));
-    println!("{:?}", format_size(s));
+    let (s, x) = get_dir_size(Path::new("/Users/shaipe/documents"));
+    println!("files: {}, size: {:?}", x, format_size(s));
+    let end = time::now();//获取结束时间
+    println!("done!start : {:?},end :{:?},duration:{:?}",start,end,end-start);
 }
 
 /// 获取单个件占用空间大小
@@ -20,29 +23,34 @@ pub fn get_file_size(file_path: &str) -> u64 {
     size
 }
 
-pub fn get_dir_size(dir_path: &Path) -> u64 {
+pub fn get_dir_size(dir_path: &Path) -> (u64, u64) {
     // let p = Path::new(dir_path);
     let mut size = 0u64;
-    if dir_path.exists() {
+    let mut lenx = 0u64;
+    if dir_path.exists() &&  dir_path.is_dir() {
         for entry in read_dir(dir_path).unwrap(){
             let path = entry.unwrap().path();
+            
             // 只对当前目录下的文件进行分类处理
             if path.is_file() {
+                lenx += 1;
                 match path.metadata() {
                     Ok(metadata) => {
-                        println!("{:?}, {:?}", path.display(), size);
+                        // println!("{:?}, {:?}", path.display(), size);
                         size += metadata.len()
                     }
                     Err(_e) =>  {}
                 };
             }
             else {
-                println!("{}, {}", path.clone().display(), size);
-                size += get_dir_size(&path);
+                // println!("{}, {}", path.clone().display(), size);
+                let (s, l) = get_dir_size(&path);
+                lenx += l;
+                size += s;
             }
         }
     }
-    size
+    (size, lenx)
 }
 
 /// 对存储空间大小进行输出格式化
