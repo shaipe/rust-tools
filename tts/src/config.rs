@@ -1,6 +1,10 @@
+use serde_derive::Deserialize;
+use std::fs::File;
+use std::io::prelude::*;
 
 /// 重复类型
-enum RepeatType {
+#[derive(Debug, Clone, Deserialize)]
+pub enum RepeatType {
     year,
     month,
     day,
@@ -10,11 +14,12 @@ enum RepeatType {
 }
 
 /// 任务
-struct Task {
+#[derive(Debug, Clone, Deserialize)]
+pub struct Task {
     // 任务名称
     name: String,
     // 任务类型
-    type: String,
+    task_type: String,
     // 执行时间
     execute_time: Option<String>,
     // 时间间隔
@@ -26,21 +31,25 @@ struct Task {
 }
 
 /// 网络请求任务
-struct RequestTask {
+#[derive(Debug, Clone, Deserialize)]
+pub struct RequestTask {
     // 请求路径
     url: String,
     // 请求数据
     data: String,
     // 请求方式
     method: String,
+    // 是否需要签名提交
+    is_sign: bool,
 }
 
 /// 基础配置信息
-struct Config {
+#[derive(Debug, Clone, Deserialize)]
+pub struct Config {
 
-    name: String,
+    pub name: String,
 
-    tasks: Vec<Task>
+    pub tasks: Vec<Task>
 }
 
 impl Config {
@@ -50,7 +59,7 @@ impl Config {
 
         // 判断传入的conf_path是否为空,如果为空就给定默认值 
         let file_path = if conf_path.len() == 0 {
-            "config.toml"
+            "config.json"
         } else {
             conf_path
         };

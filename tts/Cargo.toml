@@ -7,6 +7,9 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio="*"
-chrono="*"
+tokio= "0.1.22"
+chrono= "0.4.9"
+serde_json = "1.0.41"
+serde_derive = "1.0.102"
+serde = "1.0.102"
 # timer="*"
