@@ -4,19 +4,25 @@
         {
             "name": "计划任务配置",
             "task_type": "request",
+            "repeat": "day",
+            "interval": 1,
             "request": {
                 "url": "",
                 "method": "POST",
+                "data_type": "json",
                 "data": "{\"databaseId\":22,\"appid\":\"tts_app\",\"method\":\"sch.overall.exec\"}",
-                "is_sign": false
+                "is_sign": true
             }
         },
         {
             "name": "计划任务配置",
             "task_type": "request",
+            "repeat": "minute",
+            "interval": 2,
             "request": {
                 "url": "",
                 "method": "POST",
+                "data_type": "form",
                 "data": "{\"databaseId\":22,\"appid\":\"tts_app\",\"method\":\"sch.overall.exec\"}",
                 "is_sign": false
             }
