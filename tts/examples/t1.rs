@@ -1,16 +1,11 @@
-use tokio::prelude::*;
-use tokio::timer::Delay;
+use tokio::time::delay_for;
 
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
-fn main() {
-    let when = Instant::now() + Duration::from_millis(100);
-    let task = Delay::new(when)
-        .and_then(|_| {
-            println!("Hello world!");
-            Ok(())
-        })
-        .map_err(|e| panic!("delay errored; err={:?}", e));
 
-    tokio::run(task);
+#[tokio::main]
+async fn main() {
+    println!("start");
+    delay_for(Duration::from_millis(1000)).await;
+    println!("100 ms have elapsed");
 }

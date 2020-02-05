@@ -20,10 +20,16 @@ pub struct Task {
     name: String,
     // 任务类型
     task_type: String,
+    // 开始时间
+    start_time: Option<String>,
+    // 结束时间
+    end_time: Option<String>,
     // 执行时间
     execute_time: Option<String>,
     // 时间间隔
-    interval: Option<i32>,
+    interval: Option<u32>,
+    // 执行次数
+    times: Option<u32>,
     // 重复方式
     repeat: Option<RepeatType>,
     // 请求任务
