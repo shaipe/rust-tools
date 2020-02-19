@@ -7,8 +7,8 @@ use timer::Timer;
 fn main() {
     
     let mut t = Timer::new();
-    t.start(|x|{
-        println!("{:?}", x);
+    t.start(|x, interval|{
+        println!("{:?} -- {:?}", x, interval);
     });
     
 }
