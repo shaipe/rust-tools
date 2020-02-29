@@ -8,6 +8,8 @@ use std::io::Error;
 use crate::prox::post;
 use md5;
 use crate::accesstoken::AccessToken;
+use crate::appauthorise::AppAuthorise;
+
 const DEFAULT_DTS_URL: &'static str = "http://127.0.0.1:8090/Route.axd";
 pub struct AppOrder{
     pub fk_id:u64,
@@ -64,7 +66,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
         let decorate_list=self.decorate_list(version_app, app_id, app_name, content);
 
          //2、同步dts中
-         let x:Result<(Vec<i64>,Vec<(i64,String)>),std::io::Error>=match decorate_list{
+         let x:Result<(Vec<(u64,u32,i64)>,Vec<(u64,String)>),std::io::Error>=match decorate_list{
             Ok(list)=>{
                 self.send_order_submit(list)
             },
@@ -103,21 +105,21 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
     /**
      * 发送订单提交
      */
-    fn send_order_submit(&self,list:Vec<HashMap<String,String>>)->Result<(Vec<i64>,Vec<(i64,String)>),Error>{
+    fn send_order_submit(&self,list:Vec<HashMap<String,String>>)->Result<(Vec<(u64,u32,i64)>,Vec<(u64,String)>),Error>{
 
-        let mut error_list:Vec<(i64,String)>=Vec::new();
-        let mut success_list:Vec<i64>=Vec::new();
+        let mut error_list:Vec<(u64,String)>=Vec::new();
+        let mut success_list:Vec<(u64,u32,i64)>=Vec::new();
         for item in list{
              let mut dic=item.clone();
              dic.insert("Data".to_owned(), json::stringify(item.clone()));
 
             let res =self.post_data(&dic,"aus.package.app.submit");
-            let fkid=item.get("FKId").unwrap().parse::<i64>().unwrap();
-            
+            let fkid=item.get("FKId").unwrap().parse::<u64>().unwrap();
+            let fkflag=item.get("FKFlag").unwrap().parse::<u32>().unwrap();
             let result=self.parse_submit_content(res);
             match result{
                 Ok(s)=>{
-                    success_list.push(s);
+                    success_list.push((fkid,fkflag,s));
                 },
                 Err(e)=>{
                     error_list.push((fkid,format!("{:?}",e)));
@@ -184,19 +186,23 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
     /**
      * 发送订单回调
      */
-    fn send_order_callback(&self,list:Vec<i64>)->Result<Vec<i64>,Error>{
-        let success_list:Vec<i64>=Vec::new();
-        for order_id in list{
+    fn send_order_callback(&self,list:Vec<(u64,u32,i64)>)->Result<Vec<i64>,Error>{
+        let mut success_list:Vec<i64>=Vec::new();
+        for t in list{
             let mut dic=HashMap::new();
-            dic.insert(String::from("OrderIds"),format!("{}",order_id));
+            dic.insert(String::from("OrderIds"),format!("{}",t.2));
             dic.insert(String::from("PayStatus"),String::from("true"));
             let res=self.post_data(&dic,"aus.package.order.callback");
             let content=self.parse_callback_content(res);
             match content{
                 //更新内容
-                Ok(s)=>{},
-                Err(_)=>{}
-            }
+                Ok(s)=>{
+                    let authorise=AppAuthorise::new(t.0,t.1);
+                    authorise.update_aync_state();
+                    success_list.push(t.2);
+                },
+                Err(e)=>{},
+            };
         }
         Ok(success_list)
     }

@@ -6,6 +6,7 @@ mod apporder;
 use apporder::AppOrder;
 pub mod prox;
 pub mod accesstoken;
+pub mod appauthorise;
 fn main() {
     println!("Hello, world!");
     let web_conf: MysqlConfig = get_config("");
