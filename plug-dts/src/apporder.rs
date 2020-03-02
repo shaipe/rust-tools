@@ -1,15 +1,15 @@
-use chrono::{Local, NaiveDateTime};
-use lane::err_info;
-use lane_mysql::{DBValue, Table};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::io::Error;
-
 use crate::accesstoken::AccessToken;
 use crate::appauthorise::AppAuthorise;
 use crate::config::WebConfig;
 use crate::prox::post;
+use chrono::{Local, NaiveDateTime};
+use lane::err_info;
+use lane_mysql::{DBValue, Table};
 use md5;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::io::Error;
+
 //const DEFAULT_DTS_URL: &'static str = "http://127.0.0.1:8090/Route.axd";
 pub struct AppOrder {
     pub web: WebConfig,
@@ -39,18 +39,50 @@ impl AppOrder {
                 .to_token_string(),
         }
     }
-    /**
+     /**
      * 获得版本对应的供应商数据
      */
-    pub fn get_list_version(&self, version_app: i32) -> Result<Vec<(u64, i32, String)>, Error> {
+    pub fn get_version_count(&self, version_app: i32) ->u64 {
         let sql = format!(
             r#"
-        SELECT a.FKId,a.FKFlag,2 AS RunWay,b.Name AS CompanyName
+        SELECT count(0) as co
 FROM pak_customerapp AS a
 JOIN sup_supplier AS b
 WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
         "#,
             version_app
+        );
+        let pool = self.get_pool();
+        let res: Vec<u64> = pool
+            .prep_exec(sql, ())
+            .map(|result| {
+                result
+                    .map(|x| x.unwrap())
+                    .map(|row| {
+                        row["co"].to_u64()
+                    })
+                    .collect()
+            })
+            .unwrap();
+        if res.len()>0{
+            res[0]
+        }
+        else{
+            0
+        }
+    }
+    /**
+     * 获得版本对应的供应商数据
+     */
+    pub fn get_list_version(&self, version_app: i32,page_size:u64,page_index:u64) ->Result<Vec<(u64, i32, String)>,Error> {
+        let sql = format!(
+            r#"
+        SELECT a.FKId,a.FKFlag,2 AS RunWay,b.Name AS CompanyName
+FROM pak_customerapp AS a
+JOIN sup_supplier AS b
+WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
+        "#,
+            version_app,page_index*page_size,page_size
         );
         let pool = self.get_pool();
         let res: Vec<(u64, i32, String)> = pool
@@ -73,16 +105,12 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
     /**
      * 批量插入订单数据
      */
-    pub fn batch_insert_order(&self, version_app: i32, app_id: i32, app_name: &str, content: &str) {
+    pub fn batch_insert_order(&self,page_size:u64,page_index:u64, version_app: i32, app_id: i32, app_name: &str, content: &str) {
         //1、查询该版本下的供应商
-        let decorate_list = self.decorate_list(version_app, app_id, app_name, content);
-
+        let decorate_list = self.decorate_list(page_size,page_index, version_app, app_id, app_name, content);
         //2、同步dts中
         let x: Result<(Vec<(u64, u32, i64)>, Vec<(u64, String)>), std::io::Error> =
-            match decorate_list {
-                Ok(list) => self.send_order_submit(list),
-                Err(e) => Err(err_info!(format!("{:?}", e))),
-            };
+            self.send_order_submit(decorate_list);
         //3、支付回调
         let y = match x {
             Ok(s) => {
@@ -95,14 +123,16 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
     /**
      * 装修数据
      */
-    fn decorate_list(
+    pub fn decorate_list(
         &self,
+        page_size: u64,
+        page_index: u64,
         version_app: i32,
         app_id: i32,
         app_name: &str,
         content: &str,
-    ) -> Result<Vec<HashMap<String, String>>, std::io::Error> {
-        let result_list = self.get_list_version(version_app);
+    ) -> Vec<HashMap<String, String>> {
+        let result_list = self.get_list_version( version_app,page_size,page_index);
         let decorate_list = match result_list {
             Ok(list) => {
                 let mut vec_list = Vec::new();
@@ -114,7 +144,10 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
             }
             Err(e) => Err(err_info!(format!("{}", e))),
         };
-        decorate_list
+        match decorate_list {
+            Ok(list) => list,
+            Err(e) => Vec::new(),
+        }
     }
     /**
      * 发送订单提交
@@ -135,7 +168,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
             let result = self.parse_submit_content(res);
             match result {
                 Ok(s) => {
-                    println!("订单号：{:?},fkid={:?},fkflag={:?}", s,fkid,fkflag);
+                    println!("订单号：{:?},fkid={:?},fkflag={:?}", s, fkid, fkflag);
                     success_list.push((fkid, fkflag, s));
                 }
                 Err(e) => {
@@ -209,7 +242,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
         for t in list {
             let mut dic = HashMap::new();
             let order_id = t.2;
-            let fk_id=t.0;
+            let fk_id = t.0;
             dic.insert(String::from("OrderIds"), format!("{}", order_id));
             dic.insert(String::from("PayStatus"), String::from("true"));
             let res = self.post_data(&dic, "aus.package.order.callback");
@@ -222,7 +255,12 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
                     success_list.push(order_id);
                 }
                 Err(e) => {
-                    println!("订单回调失败：fkid={:?},order_id={:?},{:?}",fk_id,order_id,err_info!(format!("{:?}", e)));
+                    println!(
+                        "订单回调失败：fkid={:?},order_id={:?},{:?}",
+                        fk_id,
+                        order_id,
+                        err_info!(format!("{:?}", e))
+                    );
                 }
             };
         }
@@ -248,7 +286,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
             Err(e) => {
                 //println!("callback_content={:?}",x);
                 Err(err_info!(format!("{:?}", e)))
-            },
+            }
         }
     }
     /**

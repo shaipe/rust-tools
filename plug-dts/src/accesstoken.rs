@@ -29,12 +29,12 @@ impl AccessToken {
         }
     }
     pub fn to_token_string(&self) -> String {
-        let dt = Local::now() + Duration::minutes(1);
-        let ticket = dt.timestamp() * 10000 + 621355968000000000;
+        // let dt = Local::now() + Duration::minutes(1);
+        // let ticket = dt.timestamp() * 10000 + 621355968000000000;
 
         let ticket2 = self.get_ticks();
 
-        println!("{:?}，{:?}", ticket, ticket2);
+        //println!("{:?}，{:?}", ticket, ticket2);
         let ccc = format!(
             "{dbid}_0_0_{fkflag}_{fkid}_{}__0_{ticket}",
             dbid = self.db_id,

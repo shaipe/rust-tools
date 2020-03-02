@@ -13,13 +13,17 @@ pub struct WebConfig{
     pub api_domain:String,
     pub sn:String,
     pub db_id:u16,
+    pub app_id:i32,
+    pub app_name:String
 }
 impl WebConfig{
     pub fn default()->Self{
         WebConfig{
             api_domain:String::from(""),
             sn:String::from(""),
-            db_id:0
+            db_id:0,
+            app_id:0,
+            app_name:String::from("")
         }
     }
 }
