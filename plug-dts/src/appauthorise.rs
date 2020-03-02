@@ -29,7 +29,7 @@ impl AppAuthorise {
             "is_sync" => false
         };
         let res = self.update("IsSync=:is_sync", &format!("FKId={} and FKFlag={}", self.fk_id,self.fk_flag), param);
-        println!("{:?}", res);
+        println!("更新同步状态{:?}", res);
         //Ok(0)
     }
 }

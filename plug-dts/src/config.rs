@@ -8,12 +8,27 @@ use std::fs::File;
 
 
 use lane_mysql::{MysqlConfig, set_db_config};
-
+#[derive(Debug, Clone, Deserialize)]
+pub struct WebConfig{
+    pub api_domain:String,
+    pub sn:String,
+    pub db_id:u16,
+}
+impl WebConfig{
+    pub fn default()->Self{
+        WebConfig{
+            api_domain:String::from(""),
+            sn:String::from(""),
+            db_id:0
+        }
+    }
+}
 // 业务配置信息
 #[derive(Debug, Clone, Deserialize)]
 pub struct Config {
     pub title: String,
     pub upload_dir: String,
+    pub web:Option<WebConfig>,
     pub mysql: Option<MysqlConfig>
 }
 
@@ -47,24 +62,31 @@ impl Config {
 }
 
 // 获取配置信息
-pub fn get_config(mode: &str)->MysqlConfig {
+pub fn get_config(mode: &str)->WebConfig {
     let config_path = match mode {
         "dev" => "dev.conf",
         _ => "prod.conf"
     };
     let cnf: Config = Config::new(config_path);
     // 将数据库的配置写入数据库底层配置中
-   let sql_config= match cnf.clone().mysql {
+   match cnf.clone().mysql {
         Some(val) => {
             set_db_config(val.clone());
+        },
+        _ => {
+            println!("数据库连接没有配置哟!");
+        }
+    };
+
+    let web_config=match cnf.clone().web{
+        Some(val) => {
             val
         },
         _ => {
             println!("数据库连接没有配置哟!");
-            MysqlConfig::default()
+            WebConfig::default()
         }
     };
-
-    sql_config
+    web_config
 }
 
