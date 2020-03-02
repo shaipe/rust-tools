@@ -250,8 +250,9 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
             match content {
                 //更新内容
                 Ok(s) => {
-                    let authorise = AppAuthorise::new(fk_id, t.1);
-                    authorise.update_aync_state();
+                    // let authorise = AppAuthorise::new(fk_id, t.1);
+                    // authorise.update_aync_state();
+                    println!("订单回调成功：fkid={:?},order_id={:?}",fk_id,order_id);
                     success_list.push(order_id);
                 }
                 Err(e) => {
