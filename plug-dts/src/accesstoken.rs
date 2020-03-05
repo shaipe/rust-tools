@@ -42,6 +42,7 @@ impl AccessToken {
             fkid = self.fk_id,
             ticket = ticket2
         );
+       
         lane_crypto::aes_encrypt(ccc)
     }
     fn get_ticks(&self) -> i64 {

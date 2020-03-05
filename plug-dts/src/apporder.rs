@@ -48,7 +48,7 @@ impl AppOrder {
         SELECT count(0) as co
 FROM pak_customerapp AS a
 JOIN sup_supplier AS b
-WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
+WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={};
         "#,
             version_app
         );
@@ -80,7 +80,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={};
         SELECT a.FKId,a.FKFlag,2 AS RunWay,b.Name AS CompanyName
 FROM pak_customerapp AS a
 JOIN sup_supplier AS b
-WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
+WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{};
         "#,
             version_app,page_index*page_size,page_size
         );
@@ -114,7 +114,6 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
         //3、支付回调
         let y = match x {
             Ok(s) => {
-                println!("提交订单失败：{:?}", s.1);
                 self.send_order_callback(s.0)
             }
             Err(e) => Err(err_info!(format!("{:?}", e))),
@@ -168,10 +167,11 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
             let result = self.parse_submit_content(res);
             match result {
                 Ok(s) => {
-                    println!("订单号：{:?},fkid={:?},fkflag={:?}", s, fkid, fkflag);
+                    println!("订单提交成功，订单号：{:?},fkid={:?},fkflag={:?}", s, fkid, fkflag);
                     success_list.push((fkid, fkflag, s));
                 }
                 Err(e) => {
+                    println!("订单提交失败，error：{:?},fkid={:?},fkflag={:?}", e, fkid, fkflag);
                     error_list.push((fkid, format!("{:?}", e)));
                 }
             }
@@ -217,7 +217,8 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
      */
     fn parse_submit_content(&self, res: Result<String, Error>) -> Result<i64, Error> {
         let x = match res {
-            Ok(result) => json::parse(result.as_str()),
+            Ok(result) => {
+                json::parse(result.as_str())},
             Err(_) => Err(json::Error::wrong_type(format!("{:?}", res).as_str())),
         };
 
@@ -228,7 +229,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
                     order_id = obj["Content"]["orderId"].as_i64().unwrap();
                     Ok(order_id)
                 } else {
-                    Err(err_info!(format!("{:?}", obj["Content"])))
+                    Err(err_info!(format!("{:?}", obj["Message"])))
                 }
             }
             Err(e) => Err(err_info!(format!("{:?}", e))),
@@ -302,7 +303,10 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
         dic.insert("SN".to_owned(), self.web.sn.to_owned());
         dic.insert("Method".to_owned(), action.to_owned());
         dic.insert("V".to_owned(), String::from("2.0"));
-        dic.insert(String::from("Token"), self.access_token.clone());
+        use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
+    
+        let encode_token=utf8_percent_encode(&self.access_token.clone(), NON_ALPHANUMERIC).to_string();
+        dic.insert(String::from("Token"), encode_token);
         dic.insert(
             String::from("Md5"),
             format!(
@@ -310,6 +314,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND appid={} limit {},{};
                 md5::compute(format!("rwxkj:{}", self.access_token).as_bytes())
             ),
         );
+        //println!("token={:?}",self.access_token);
         post(&self.web.api_domain, dic)
     }
 }
