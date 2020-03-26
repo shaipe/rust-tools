@@ -1,6 +1,6 @@
 extern crate url;
-#[cfg(feature = "http")]
-extern crate reqwest;
+// #[cfg(feature = "http")]
+// extern crate reqwest;
 
 extern crate percent_encoding;
 
