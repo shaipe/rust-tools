@@ -1,7 +1,7 @@
 use crate::accesstoken::AccessToken;
 use crate::appauthorise::AppAuthorise;
 use crate::config::WebConfig;
-use crate::prox::post;
+use crate::proxy::post;
 use chrono::{Local, NaiveDateTime};
 use lane::err_info;
 use lane_mysql::{DBValue, Table};

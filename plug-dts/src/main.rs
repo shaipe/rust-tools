@@ -5,7 +5,7 @@ mod apporder;
 use apporder::AppOrder;
 pub mod accesstoken;
 pub mod appauthorise;
-pub mod prox;
+pub mod proxy;
 use chrono::{DateTime, Datelike, Duration, Local, NaiveDate, Utc};
 fn main() {
     let web_conf: WebConfig = get_config("");

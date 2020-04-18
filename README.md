@@ -38,3 +38,8 @@ mysql数据库日志分析,把binlog日志转换为sql后,此工具体把sql文�
 ## 学习资料
 
 - [Rust 学习指南 - Rust 高级结构](https://www.codemore.top/p/234853bd-4f89-3df9-ae18-994110faf023)
+
+### tip ssl error
+```bash
+git config --global http.sslVerify false
+```
