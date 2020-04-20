@@ -5,13 +5,19 @@ mod apporder;
 use apporder::AppOrder;
 pub mod accesstoken;
 pub mod appauthorise;
+use appauthorise::AppAuthorise;
 pub mod proxy;
+#[macro_use] extern crate mysql;
 use chrono::{DateTime, Datelike, Duration, Local, NaiveDate, Utc};
 fn main() {
     let web_conf: WebConfig = get_config("");
-    let version_apps: Vec<i32> = vec![1008];
+    let version_apps: Vec<i32> = vec![1008,1003];
     let fk_id: u64 = 1;
     let fk_flag: u32 = 3;
+    let app_authorise=AppAuthorise::new(fk_id,fk_flag);
+    let res=app_authorise.insert_default(&version_apps,web_conf.app_id);
+    println!("res={:?}",res);
+   
     //实例化
     let apporder = AppOrder::new(&web_conf, fk_id, fk_flag, "运营商");
     for version_app in version_apps {
