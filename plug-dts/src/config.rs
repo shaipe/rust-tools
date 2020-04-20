@@ -14,6 +14,7 @@ pub struct WebConfig{
     pub sn:String,
     pub db_id:u16,
     pub app_id:i32,
+    pub version_apps:Vec<i32>,
     pub app_name:String
 }
 impl WebConfig{
@@ -23,6 +24,7 @@ impl WebConfig{
             sn:String::from(""),
             db_id:0,
             app_id:0,
+            version_apps:Vec::new(),
             app_name:String::from("")
         }
     }

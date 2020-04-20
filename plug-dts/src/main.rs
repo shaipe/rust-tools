@@ -11,7 +11,7 @@ pub mod proxy;
 use chrono::{DateTime, Datelike, Duration, Local, NaiveDate, Utc};
 fn main() {
     let web_conf: WebConfig = get_config("");
-    let version_apps: Vec<i32> = vec![1008,1003];
+    let version_apps: Vec<i32> = web_conf.version_apps.clone();
     let fk_id: u64 = 1;
     let fk_flag: u32 = 3;
     let app_authorise=AppAuthorise::new(fk_id,fk_flag);
