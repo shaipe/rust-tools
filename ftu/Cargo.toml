@@ -9,6 +9,6 @@ edition = "2018"
 [dependencies]
 
 [features]
-default = ["mysql"]
+default = []
 mysql = []
 postgres =[]
