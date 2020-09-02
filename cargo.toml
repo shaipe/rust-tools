@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "./tool",
+    "./iislog",
+    "./actix-demo",
+    "./tts",
+    "./rdl",
+    "./las",
+    "./wmps",
+    "./tosql",
+    "./order"
+]
