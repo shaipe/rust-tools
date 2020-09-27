@@ -1,7 +1,7 @@
 use lane_mysql::{DBValue, Table};
 
-use std::collections::HashMap;
 use mysql::error::Error;
+use std::collections::HashMap;
 pub struct AppAuthorise {
     pub fk_id: u64,
     pub fk_flag: u32,
@@ -37,13 +37,15 @@ impl AppAuthorise {
     /**
      * 获得版本对应的供应商数据
      */
-    pub fn insert_default(&self, version_apps: &Vec<i32>, app_id: i32) -> Result<u64, mysql::error::Error> {
+    pub fn insert_default(
+        &self,
+        version_apps: &Vec<i32>,
+        app_id: i32,
+    ) -> Result<u64, mysql::error::Error> {
         // let  version_app_ids:Vec<mysql::Value>=version_apps.iter().map(|x|{
         //     mysql::Value::from(x)
         // }).collect();
-        let  version_app_ids:Vec<String>=version_apps.iter().map(|x|{
-            x.to_string()
-        }).collect();
+        let version_app_ids: Vec<String> = version_apps.iter().map(|x| x.to_string()).collect();
         let param: Vec<(String, mysql::Value)> = params! {
             "app_id" => app_id
         };
@@ -56,9 +58,10 @@ impl AppAuthorise {
           , sup_supplier AS b 
           , pak_app AS c
           WHERE a.fkid=b.id AND a.fkflag=2 and b.expireTime>NOW() AND a.appid not IN({}) AND c.Id=:app_id;
-        "#,version_app_ids.join(",")
+        "#,
+            version_app_ids.join(",")
         );
-        println!("{:?}",sql);
+        println!("{:?}", sql);
         let pool = self.get_pool();
         let mut stmt = match pool.prepare(sql) {
             Ok(stmt) => stmt,

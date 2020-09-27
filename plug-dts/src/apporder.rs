@@ -39,10 +39,10 @@ impl AppOrder {
                 .to_token_string(),
         }
     }
-     /**
+    /**
      * 获得版本对应的供应商数据
      */
-    pub fn get_version_count(&self, version_app: i32) ->u64 {
+    pub fn get_version_count(&self, version_app: i32) -> u64 {
         let sql = format!(
             r#"
         SELECT count(0) as co
@@ -58,23 +58,25 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={};
             .map(|result| {
                 result
                     .map(|x| x.unwrap())
-                    .map(|row| {
-                        row["co"].to_u64()
-                    })
+                    .map(|row| row["co"].to_u64())
                     .collect()
             })
             .unwrap();
-        if res.len()>0{
+        if res.len() > 0 {
             res[0]
-        }
-        else{
+        } else {
             0
         }
     }
     /**
      * 获得版本对应的供应商数据
      */
-    pub fn get_list_version(&self, version_app: i32,page_size:u64,page_index:u64) ->Result<Vec<(u64, i32, String)>,Error> {
+    pub fn get_list_version(
+        &self,
+        version_app: i32,
+        page_size: u64,
+        page_index: u64,
+    ) -> Result<Vec<(u64, i32, String)>, Error> {
         let sql = format!(
             r#"
         SELECT a.FKId,a.FKFlag,2 AS RunWay,b.Name AS CompanyName
@@ -82,7 +84,9 @@ FROM pak_customerapp AS a
 JOIN sup_supplier AS b
 WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{};
         "#,
-            version_app,page_index*page_size,page_size
+            version_app,
+            page_index * page_size,
+            page_size
         );
         let pool = self.get_pool();
         let res: Vec<(u64, i32, String)> = pool
@@ -102,21 +106,33 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{}
             .unwrap();
         return Ok(res);
     }
-   
     /**
      * 批量插入订单数据
      */
-    pub fn batch_insert_order(&self,page_size:u64,page_index:u64, version_app: i32, app_id: i32, app_name: &str, content: &str) {
+    pub fn batch_insert_order(
+        &self,
+        page_size: u64,
+        page_index: u64,
+        version_app: i32,
+        app_id: i32,
+        app_name: &str,
+        content: &str,
+    ) {
         //1、查询该版本下的供应商
-        let decorate_list = self.decorate_list(page_size,page_index, version_app, app_id, app_name, content);
+        let decorate_list = self.decorate_list(
+            page_size,
+            page_index,
+            version_app,
+            app_id,
+            app_name,
+            content,
+        );
         //2、同步dts中
         let x: Result<(Vec<(u64, u32, i64)>, Vec<(u64, String)>), std::io::Error> =
             self.send_order_submit(decorate_list);
         //3、支付回调
         let y = match x {
-            Ok(s) => {
-                self.send_order_callback(s.0)
-            }
+            Ok(s) => self.send_order_callback(s.0),
             Err(e) => Err(err_info!(format!("{:?}", e))),
         };
     }
@@ -132,7 +148,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{}
         app_name: &str,
         content: &str,
     ) -> Vec<HashMap<String, String>> {
-        let result_list = self.get_list_version( version_app,page_size,page_index);
+        let result_list = self.get_list_version(version_app, page_size, page_index);
         let decorate_list = match result_list {
             Ok(list) => {
                 let mut vec_list = Vec::new();
@@ -168,11 +184,17 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{}
             let result = self.parse_submit_content(res);
             match result {
                 Ok(s) => {
-                    println!("订单提交成功，订单号：{:?},fkid={:?},fkflag={:?}", s, fkid, fkflag);
+                    println!(
+                        "订单提交成功，订单号：{:?},fkid={:?},fkflag={:?}",
+                        s, fkid, fkflag
+                    );
                     success_list.push((fkid, fkflag, s));
                 }
                 Err(e) => {
-                    println!("订单提交失败，error：{:?},fkid={:?},fkflag={:?}", e, fkid, fkflag);
+                    println!(
+                        "订单提交失败，error：{:?},fkid={:?},fkflag={:?}",
+                        e, fkid, fkflag
+                    );
                     error_list.push((fkid, format!("{:?}", e)));
                 }
             }
@@ -218,8 +240,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{}
      */
     fn parse_submit_content(&self, res: Result<String, Error>) -> Result<i64, Error> {
         let x = match res {
-            Ok(result) => {
-                json::parse(result.as_str())},
+            Ok(result) => json::parse(result.as_str()),
             Err(_) => Err(json::Error::wrong_type(format!("{:?}", res).as_str())),
         };
 
@@ -254,7 +275,7 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{}
                 Ok(s) => {
                     // let authorise = AppAuthorise::new(fk_id, t.1);
                     // authorise.update_aync_state();
-                    println!("订单回调成功：fkid={:?},order_id={:?}",fk_id,order_id);
+                    println!("订单回调成功：fkid={:?},order_id={:?}", fk_id, order_id);
                     success_list.push(order_id);
                 }
                 Err(e) => {
@@ -305,8 +326,9 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{}
         dic.insert("Method".to_owned(), action.to_owned());
         dic.insert("V".to_owned(), String::from("2.0"));
         use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-    
-        let encode_token=utf8_percent_encode(&self.access_token.clone(), NON_ALPHANUMERIC).to_string();
+
+        let encode_token =
+            utf8_percent_encode(&self.access_token.clone(), NON_ALPHANUMERIC).to_string();
         dic.insert(String::from("Token"), encode_token);
         dic.insert(
             String::from("Md5"),
@@ -317,5 +339,98 @@ WHERE a.fkid=b.id AND a.fkflag=2 AND b.expireTime>NOW() AND appid={} limit {},{}
         );
         //println!("token={:?}",self.access_token);
         post(&self.web.api_domain, dic)
+    }
+    /**同步app */
+    pub fn async_app(&self) -> Result<u64, Error> {
+        let dic = HashMap::new();
+        let res = self.post_data(&dic, "aus.package.product.apps");
+        let x: serde_json::Value = match res {
+            Ok(result) => match serde_json::from_str(result.as_str()) {
+                Ok(s) => s,
+                Err(e) => {
+                    return Err(err_info!(format!("{:?}", e)));
+                }
+            },
+            Err(e) => return Err(err_info!(format!("{:?}", e))),
+        };
+        if x["Success"].as_bool().unwrap() {
+            if let Err(e) = self.del_app() {
+                return Err(err_info!(format!("{:?}", e)));
+            }
+            let r = self.insert_app(&x);
+        } else {
+            return Err(err_info!(format!("{:?}", x["Content"])));
+        }
+        // println!("{:?},{:?}", content["Id"], content);
+
+        Ok(1)
+    }
+    pub fn del_app(&self) -> Result<i64, mysql::error::Error> {
+        let sql = "TRUNCATE TABLE pak_app;";
+        let pool = self.get_pool();
+        let mut stmt = match pool.prepare(sql) {
+            Ok(stmt) => stmt,
+            Err(e) => {
+                return Err(e);
+            }
+        };
+        let res = stmt.execute(());
+        // 返回最后插入的id
+        let c = match res {
+            Ok(_) => Ok(1),
+            Err(e) => Err(e),
+        };
+        c
+    }
+    pub fn insert_app(&self, x: &serde_json::Value) -> Result<u64, mysql::error::Error> {
+        let list = x["Content"].as_array().unwrap();
+        let pool = self.get_pool();
+        for content in list {
+            let verreorder = match content["VerReorder"].as_u64() {
+                Some(v) => v,
+                None => 0,
+            };
+            let radix = match content["Radix"].as_u64() {
+                Some(v) => v,
+                None => 0,
+            };
+            let sql = format!(
+                r#"INSERT INTO pak_app( `Id`,`Name`,`Icon`,`Description`,`Unit`,`Price`,`TimePeriod`,`PeriodUnit`,`Radix`,`KeyWord`,`Sells`,`Reorder`,`Status`,`Users`,`AppType`,`BuyType`,VerReorder)
+                SELECT {appid},'{appname}','{icon}','{description}','{unit}',{price},{timeperiod},{periodunit},{radix},'{keyword}',{sells},{reorder},{status},{users},'{apptype}',{buytype},{verreorder};
+            "#,
+                appid = content["AppId"].as_u64().unwrap(),
+                appname = content["Name"].as_str().unwrap(),
+                icon = content["Icon"].as_str().unwrap(),
+                description = content["Description"].as_str().unwrap(),
+                unit = content["Unit"].as_str().unwrap(),
+                price = content["Price"].as_f64().unwrap(),
+                timeperiod = content["TimePeriod"].as_u64().unwrap(),
+                periodunit = content["PeriodUnit"].as_u64().unwrap(),
+                radix = radix,
+                keyword = content["KeyWord"].as_str().unwrap(),
+                sells = content["Sells"].as_u64().unwrap(),
+                reorder = content["Reorder"].as_u64().unwrap(),
+                status = content["Status"].as_u64().unwrap(),
+                users = content["Users"].as_u64().unwrap(),
+                apptype = content["AppType"].as_u64().unwrap(),
+                buytype = content["BuyType"].as_u64().unwrap(),
+                verreorder = verreorder,
+            );
+            let mut stmt = match pool.prepare(sql) {
+                Ok(stmt) => stmt,
+                Err(e) => {
+                    println!("-----{:?}", e);
+                    return Err(e);
+                }
+            };
+            let res = stmt.execute(());
+            // 返回最后插入的id
+            let c = match res {
+                Ok(r) => Ok(r.affected_rows()),
+                Err(e) => Err(e),
+            };
+            //li.push(sql);
+        }
+        return Ok(1);
     }
 }
