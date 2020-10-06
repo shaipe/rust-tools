@@ -63,7 +63,8 @@ pub fn show_streams(attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(AnswerFn)]
-pub fn derive_answer_fn(_item: TokenStream) -> TokenStream {
+pub fn derive_answer_fn(item: TokenStream) -> TokenStream {
+    println!("{:?}", item);
     "fn answer() -> u32 { 42 }".parse().unwrap()
 }
 

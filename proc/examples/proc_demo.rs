@@ -5,10 +5,13 @@ fn wrapped_function(t: i32) -> i32 {
     t + 5
 }
 
-// use proc::{show_streams, AnswerFn, HelperAttr};
+use proc::{show_streams, AnswerFn};
 
-// #[derive(AnswerFn)]
-// struct Struct;
+#[derive(AnswerFn, Debug, Clone)]
+struct StructT{
+    id: i32,
+    sss_len: i32,
+}
 
 // #[derive(HelperAttr)]
 // struct Struct2 {
@@ -41,7 +44,12 @@ fn wrapped_function(t: i32) -> i32 {
 // // out: item: "fn invoke4() {}"
 
 fn main() {
-    println!("{:?}", wrapped_function(6));
+    // println!("{:?}", wrapped_function(6));
+
+    println!("{:?}", StructT{
+        id: 0,
+        sss_len: 0,
+    });
 
     // println!("{:?}", answer());
 }
