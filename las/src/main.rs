@@ -19,12 +19,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(
                 middleware::DefaultHeaders::new()
                     .header("X-Version", "0.1")
-                    .header("sever", "las-server")
+                    .header("sever", "las-server"),
             )
-            .service(
-                web::resource("/collect")
-                    .route(web::post().to(collect::collect_post)),
-            )
+            .service(web::resource("/collect").route(web::post().to(collect::collect_post)))
     })
     .bind(addr)?
     // .workers(1) // 指定启用的工作线程数
