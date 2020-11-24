@@ -9,5 +9,6 @@ members = [
     "./wmps",
     "./tosql",
     "./order",
-    "./proc"
+    "./proc",
+    "./stress"
 ]
