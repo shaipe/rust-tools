@@ -17,7 +17,7 @@ use config::{get_config, RequestConfig};
 //         .post("http://192.168.17.212:8083/demo/document")
 //         .json(&serde_json::json!({
 //             "author": "X项目组",
-//             "category":"",
+//             "category":"类别2",
 //             "createdTime": Local::now().to_rfc3339(),
 //             "docPath": "",
 //             "hits": "0",
@@ -53,18 +53,20 @@ async fn get_data(conf: RequestConfig) {
             // 成功
             if res.status() == 200 {
                 // 返回状态成功
-                // match res.text().await {
-                //     Ok(txt) => println!("{}", txt),
-                //     Err(e) => println!("{}", e),
-                // }
+                match res.text().await {
+                    Ok(txt) => info!("{}", txt),
+                    Err(e) => println!("{}", e),
+                }
             } else {
                 error!("error {}", res.status());
+                println!("{:?}", "error");
                 // 返回错误
             }
         }
         Err(err) => {
+
             // 报错
-            println!("{}", err);
+            error!("{}", err);
         }
     }
 }
