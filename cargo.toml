@@ -10,5 +10,6 @@ members = [
     "./tosql",
     "./order",
     "./proc",
-    "./stress"
+    "./stress",
+    "uuid"
 ]
