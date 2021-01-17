@@ -1,5 +1,5 @@
 [package]
-name = "uuid_t"
+name = "tool_gtk"
 version = "0.1.0"
 authors = ["shaipe <shaipe@live.com>"]
 edition = "2018"
@@ -7,4 +7,5 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-uuid = { version = "0.8.2", features = ["serde", "v1", "v3", "v4", "v5" ] }
+gtk = "0.9.2"
+glib = "0.10.3"

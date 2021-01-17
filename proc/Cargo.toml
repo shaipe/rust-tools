@@ -8,11 +8,11 @@ edition = "2018"
 
 [dependencies]
 async-mutex = "1.4.0"
-quote = "1.0.7"
+quote = "1.0.8"
 
 
 [dependencies.syn]
-version = "1.0.51"
+version = "1.0.58"
 features = ["full"]
 
 
