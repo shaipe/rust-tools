@@ -1,16 +1,16 @@
 #[derive(Debug, Clone)]
 struct Book {
-    name: String
+    name: String,
 }
 
 impl Book {
-     fn show_book_name(&self) {
-         // .... 
-         println!("name is: {}", self.name);
-     }
+    fn show_book_name(&self) {
+        // ....
+        println!("name is: {}", self.name);
+    }
 }
 
-use std::ops::{Deref};
+use std::ops::Deref;
 
 #[derive(Debug, Clone)]
 struct MyBook {
@@ -21,18 +21,20 @@ struct MyBook {
 impl MyBook {
     fn new() -> MyBook {
         MyBook {
-            p: Book{name: "知乎大全".to_string()},
-            author: "我是谁".to_string()
-       }
-     }
+            p: Book {
+                name: "知乎大全".to_string(),
+            },
+            author: "我是谁".to_string(),
+        }
+    }
 }
 
 impl Deref for MyBook {
-     type Target = Book;
+    type Target = Book;
 
-     fn deref<'a>(&'a self) -> &'a Book {
-          &self.p
-}
+    fn deref<'a>(&'a self) -> &'a Book {
+        &self.p
+    }
 }
 fn main() {
     let mut mybook = MyBook::new();
