@@ -12,5 +12,6 @@ members = [
     "./proc",
     "./stress",
     "uuid",
-    "gtk"
+    "gtk",
+    "sdm"
 ]
