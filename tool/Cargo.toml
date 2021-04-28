@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 printpdf = "0.3.4"
+lopdf = "0.26.0"
 # log= "0.4.8"
 # log4rs= "0.10.0"
 # serde= "1.0.104"
