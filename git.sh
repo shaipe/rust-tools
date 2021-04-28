@@ -14,7 +14,7 @@ read input_msg
 git commit -a -m "$input_msg"
 git pull
 git push
-git push gitee
+git push gitee --force
 
 echo "git commit and push success"
 
